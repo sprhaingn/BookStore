@@ -134,11 +134,49 @@ public class DAOCart extends DBConnect {
         return cart;
     }
 
+    public Cart findCart(int userId, int bookId) {
+        Cart cart = null;
+        try {
+            String FIND_CART_BY_BOOK_ID_AND_USERID = "select * from Cart \n"
+                    + "where user_id = ? and book_id = ?";
+            pre = conn.prepareStatement(FIND_CART_BY_BOOK_ID_AND_USERID);
+
+            pre.setInt(1, userId);
+            pre.setInt(2, bookId);
+
+            rs = pre.executeQuery();
+            while (rs.next()) {
+                int quantity = rs.getInt(3);
+
+                cart = new Cart(userId, bookId, quantity);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(DAOCart.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return cart;
+    }
+
+    public void deleteFromCart(int bookId, int userID) {
+        try {
+            String DELETE_BY_BOOK_ID = "delete from cart where book_id=? AND user_id=? ";
+            pre = conn.prepareStatement(DELETE_BY_BOOK_ID);
+            pre.setInt(1, bookId);
+            pre.setInt(2, userID);
+
+            pre.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(DAOCart.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+
+
     public static void main(String[] args) {
         DAOCart dao = new DAOCart();
-        int userId = 2;
-        int bookid = 1;
-        Vector<Cart> c = dao.findCartById(userId);
-        System.out.println(c.toString());
+        int userId = 1;
+        int bookId = 1;
+        Cart c = dao.findCart(userId, bookId);
+
+        System.out.println(c);
     }
 }

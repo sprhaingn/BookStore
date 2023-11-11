@@ -310,7 +310,6 @@ public class BookController extends HttpServlet {
         } catch (NumberFormatException e) {
             request.setAttribute("message", "Invalid input. Please provide valid quantity and price.");
         }
-
         getRequestDispatch(request, response, "/book/edit_book.jsp");
     }
 

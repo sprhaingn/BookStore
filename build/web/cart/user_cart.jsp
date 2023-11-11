@@ -20,7 +20,6 @@
         <title>Cart</title>
         <%
             Users user = (Users) request.getAttribute("user");
-            double total = (Double) request.getAttribute("total");
             Vector<Cart> cart = (Vector<Cart>) request.getAttribute("cart");
             Vector<Books> book = (Vector<Books>) request.getAttribute("book");
             CartController cartController = (CartController) request.getAttribute("cartC");
@@ -65,54 +64,67 @@
             </div>
         </nav>
 
-        <form>
-            <input type="hidden" name="userId" value="<%=user.getUserID()%>">
-            <section class="h-100 h-custom">
-                <div class="container h-100 py-5">
-                    <div class="row d-flex justify-content-center align-items-center h-100">
-                        <div class="col">
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Title</th>
-                                            <th scope="col">Author</th>
-                                            <th scope="col">Category</th>
-                                            <th scope="col">Quantity</th>
-                                            <th scope="col">Price</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <% for (Book b : book) {
-                                        %>
-                                        <tr>
-                                            <td><%= b.getTitle() %></td>
-                                            <td><%= b.getAuthor() %></td>
-                                            <td><%= b.getCategory() %></td>
-                                            <td>
-                                                <div class="d-flex flex-row">
-                                                    <button class="btn btn-link px-2"
-                                                            onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
-                                                        <i class="fas fa-minus"></i>
-                                                    </button>
-                                                    <input id="form1" min="0" name="quantity" value="<%=cartController.findQuantityInCart(b.getBookId(),user.getUserID())%>"
-                                                           type="number" class="form-control form-control-sm" style="width: 50px;" />
-                                                    <button class="btn btn-link px-2"
-                                                            onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
-                                                        <i class="fas fa-plus"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                            <td><%= b.getPrice() %></td>
-                                        </tr>
-                                        <% } %>
-                                    </tbody>
-                                </table>
-                            </div>
+        <section class="h-100 h-custom">
+            <div class="container h-100 py-5">
+                <div class="row d-flex justify-content-center align-items-center h-100">
+                    <div class="col">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Title</th>
+                                        <th scope="col">Author</th>
+                                        <th scope="col">Category</th>
+                                        <th scope="col">Quantity</th>
+                                        <th scope="col">Price</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% for (Books b : book) { %>
+                                    <tr>
+                                        <td><%= b.getTitle() %></td>
+                                        <td><%= b.getAuthor() %></td>
+                                        <td><%= b.getCategory() %></td>
+                                        <td>
+                                            <div class="d-flex flex-row">
+                                                <input id="form1" min="0" name="quantity" value="<%=cartController.findQuantityInCart(b.getBookId(),user.getUserId())%>"
+                                                       type="number" class="form-control form-control-sm" style="width: 50px;" />
+                                            </div>
+                                        </td>
+                                        <td><%= b.getPrice() %></td>
+                                        <td>
+                                            <form action="CartController?action=removeBookInCart&userId=<%=user.getUserId()%>" method="post">
+                                                <input type="hidden" name="cartBookId" value="<%= b.getBookId() %>">
+                                                <input type="submit" class="btn btn-danger" value="Delete" />
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <% } %>
+                                    <tr>
+                                        <td colspan="4"><strong>Total</strong></td>
+                                        <td><strong>$<span><%=(double) request.getAttribute("total")%></span></strong></td>
+                                        <td></td> <!-- Empty column for the button alignment -->
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <%if (cart.size() > 0) {%>
+                            <form action="CartController?updateCart&userId=<%=user.getUserId()%>" method="post">
+                                <input type="hidden" name="quantity" value="quantity">
+                                <input type="submit" class="btn btn-danger" value="Update Cart" />
+                            </form>
+
+                            <form>
+                                <div id="cid_2" class="form-input-wide">
+                                    <div data-align="auto" class="form-buttons-wrapper form-buttons-auto   jsTest-button-wrapperField"><button id="input_2" type="submit" class="form-submit-button form-submit-button-simple_blue submit-button jf-form-buttons jsTest-submitField" data-component="button" data-content="" name="update" value="buy" >Buy</button></div>
+                                </div>
+                            </form>
+                            <%}%>
                         </div>
                     </div>
                 </div>
-            </section>
-        </form>
+            </div>
+        </section>
     </body>
 </html>

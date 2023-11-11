@@ -48,7 +48,7 @@
                         </div>
                     </form>
                     <form>
-                        <a class="btn btn-success btn-sm ml-3" href="#">
+                        <a class="btn btn-success btn-sm ml-3" href="/CartController?action=viewCart&userId=<%=user.getUserId()%>">
                             <i class="fa fa-shopping-cart"></i> Cart
                             <span class="badge badge-light"></span>
                         </a>

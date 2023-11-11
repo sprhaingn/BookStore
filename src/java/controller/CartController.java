@@ -94,6 +94,12 @@ public class CartController extends HttpServlet {
             case "addToCart":
                 addToCart(request, response);
                 break;
+            case "removeBookInCart":
+                removeBookFromCart(request, response);
+                break;
+            case "updateCart":
+                UpdateQuantity(request, response);
+                break;
         }
     }
 
@@ -137,12 +143,12 @@ public class CartController extends HttpServlet {
         }
     }
 
-    private void viewCart(HttpServletRequest request, HttpServletResponse response) {
+    private void viewCart(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int userId = Integer.parseInt(request.getParameter("userId"));
         Vector<Books> book = new Vector<>();
         Vector<Cart> cart = daoCart.findCartById(userId);
         Users user = daoUser.findId(userId);
-        
+
         request.setAttribute("user", user);
         request.setAttribute("cart", cart);
         request.setAttribute("book", book);
@@ -157,9 +163,48 @@ public class CartController extends HttpServlet {
         }
         request.setAttribute("total", total);
 
-        getRequestDispatch(request, response, "/cart/user_cart.jsp");
+        request.getRequestDispatcher("/cart/user_cart.jsp").forward(request, response);
     }
 
+    public int findQuantityInCart(int bookId, int userid) {
+        Cart cart = daoCart.findCart(userid, bookId);
+        return cart.getQuantity();
+    }
+
+    private void removeBookFromCart(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        int userId = Integer.parseInt(request.getParameter("userId"));
+        Users user = daoUser.findId(userId);
+        request.setAttribute("user", user);
+
+        int cartBookId = Integer.parseInt(request.getParameter("cartBookId"));
+        daoCart.deleteFromCart(cartBookId, userId);
+
+        getRequestDispatch(request, response, "/cart/user_cart.jsp");
+        viewCart(request, response);
+    }
+
+    private void UpdateQuantity(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int userId = Integer.parseInt(request.getParameter("userId"));
+        Vector<Cart> cart = daoCart.findCartById(userId);
+        int quantity = Integer.parseInt(request.getParameter("quantity"));
+        int cartBookId = 0;
+
+        if (quantity > daoStock.findQuantityByBookID(cartBookId)) {
+            request.setAttribute("message", "The requested quantity exceeds the available stock for this item.");
+        } else {
+            for (Cart c : cart) {
+                cartBookId = c.getBookId();
+                request.setAttribute("message", "Update Cart succesfully");
+                daoCart.updateCart(cartBookId, userId, quantity);
+            }
+        }
+        getRequestDispatch(request, response, "/cart/user_cart.jsp");
+        viewCart(request, response);
+    }
+    
+    private void Order(HttpServletRequest request, HttpServletResponse response){
+        
+    }
     //SEND TO VIEW
     private void getRequestDispatch(HttpServletRequest request, HttpServletResponse response, String view) {
         RequestDispatcher rd = request.getRequestDispatcher(view);
